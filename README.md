@@ -8,6 +8,12 @@
 - 📍 **Geolocalización:** Cómo llegar a los eventos mediante Google Maps.
 - 🔥 **Backend:** Conexión en tiempo real con Firebase Cloud Firestore.
 
+## 🖼️ Gestión de Imágenes
+Para asegurar que las imágenes de la aplicación no caduquen y se vean correctamente, se recomienda seguir estas pautas:
+
+### Wikimedia Commons
+URLs de imagenes permanentes y libres de derechos.
+
 ## 🛠️ Tecnologías utilizadas
 - **Flutter & Dart**
 - **Firebase (Auth & Firestore)**

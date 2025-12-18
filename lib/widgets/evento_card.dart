@@ -109,10 +109,37 @@ class EventoCard extends StatelessWidget {
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  // Mientras carga la imagen del servidor:
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 200,
+                      color: Colors.grey[200],
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      ),
+                    );
+                  },
+                  // Si la URL es inválida o falla la red:
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 200,
                     color: Colors.grey[300],
-                    child: const Icon(Icons.image_not_supported, size: 50),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                        SizedBox(height: 8),
+                        Text(
+                          "Imagen no disponible",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Positioned(
