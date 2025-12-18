@@ -1,0 +1,37 @@
+name: finde_cat
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # --- LIBRERÍAS DE FIREBASE ---
+  firebase_core: ^3.0.0      # El motor principal
+  firebase_auth: ^5.0.0      # Para el Login de David
+  cloud_firestore: ^5.0.0    # Para tu base de datos de eventos
+  
+  # --- EXTRAS ÚTILES ---
+  provider: ^6.1.2           # Para gestionar el estado de la app de forma sencilla
+  intl: ^0.20.2             # Para dar formato a las fechas de los eventos
+  http: ^1.6.0
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  # No olvides activar esto si vas a usar imágenes locales
+  # assets:
+  #   - assets/images/
