@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../services/database_service.dart';
-import '../models/evento_model.dart';
-import '../widgets/evento_card.dart';
+import '../../services/database_service.dart';
+import '../../models/evento_model.dart';
+import '../../widgets/evento_card.dart';
+// IMPORTANTE: Importa tus nuevos widgets fragmentados
+import 'home/widgets/home_search_bar.dart';
+import 'home/widgets/home_filters.dart';
 
-// Cambiamos a StatefulWidget para poder cambiar el filtro dinámicamente
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -12,107 +14,86 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Filtro por defecto: 0 = Todos, 1 = 15 días, 2 = 30 días
-  int _filtroSeleccionado = 0;
+  final DatabaseService _db = DatabaseService();
+  late Stream<List<Evento>> _eventosStream;
 
-  List<Evento> _aplicarFiltro(List<Evento> eventos) {
-    final ahora = DateTime.now();
+  // Aquí es donde vive el controlador
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
+  int _filtroTemporal = 0;
 
-    if (_filtroSeleccionado == 1) {
-      // Próximos 15 días
-      final limite = ahora.add(const Duration(days: 15));
-      return eventos
-          .where(
-            (e) =>
-                e.fechaInicio.isAfter(ahora) && e.fechaInicio.isBefore(limite),
-          )
+  @override
+  void initState() {
+    super.initState();
+    _eventosStream = _db.getEventos();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose(); // Limpieza de memoria
+    super.dispose();
+  }
+
+  // ... lógica de _aplicarFiltros (igual que antes) ...
+  List<Evento> _aplicarFiltros(List<Evento> lista) {
+    List<Evento> resultados = lista;
+    if (_filtroTemporal != 0) {
+      final ahora = DateTime.now();
+      final dias = _filtroTemporal == 1 ? 15 : 30;
+      final fechaLimite = ahora.add(Duration(days: dias));
+      resultados = resultados
+          .where((e) => e.fechaInicio.isBefore(fechaLimite))
           .toList();
-    } else if (_filtroSeleccionado == 2) {
-      // Próximo mes
-      final limite = ahora.add(const Duration(days: 30));
-      return eventos
+    }
+    if (_searchQuery.isNotEmpty) {
+      resultados = resultados
           .where(
-            (e) =>
-                e.fechaInicio.isAfter(ahora) && e.fechaInicio.isBefore(limite),
+            (e) => e.titulo.toLowerCase().contains(_searchQuery.toLowerCase()),
           )
           .toList();
     }
-    return eventos; // Todos
+    return resultados;
   }
 
   @override
   Widget build(BuildContext context) {
-    final DatabaseService db = DatabaseService();
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Finde Cat 🐾',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.deepOrange,
-        foregroundColor: Colors.white,
-      ),
+      appBar: AppBar(title: const Text('Finde Cat 🐾')),
       body: Column(
         children: [
-          // BARRA DE FILTROS (CHIPS)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            child: Row(
-              children: [
-                _filtroChip(0, "Todos"),
-                const SizedBox(width: 8),
-                _filtroChip(1, "Próximos 15 días"),
-                const SizedBox(width: 8),
-                _filtroChip(2, "Próximo mes"),
-              ],
-            ),
+          // USAMOS EL WIDGET FRAGMENTADO
+          HomeSearchBar(
+            controller: _searchController, // Pasamos el controlador
+            query: _searchQuery,
+            onChanged: (val) => setState(() => _searchQuery = val),
+            onClear: () {
+              _searchController.clear();
+              setState(() => _searchQuery = "");
+            },
           ),
-
-          // LISTA DE EVENTOS
+          // USAMOS EL WIDGET FRAGMENTADO
+          HomeFilters(
+            filtroTemporal: _filtroTemporal,
+            onFilterSelected: (index) =>
+                setState(() => _filtroTemporal = index),
+          ),
           Expanded(
             child: StreamBuilder<List<Evento>>(
-              stream: db.getEventos(),
+              stream: _eventosStream,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+                if (!snapshot.hasData)
                   return const Center(child: CircularProgressIndicator());
-                }
-
-                final todosLosEventos = snapshot.data ?? [];
-                final eventosFiltrados = _aplicarFiltro(todosLosEventos);
-
-                if (eventosFiltrados.isEmpty) {
-                  return const Center(
-                    child: Text('No hay eventos para este filtro.'),
-                  );
-                }
-
+                final eventos = _aplicarFiltros(snapshot.data!);
                 return ListView.builder(
-                  itemCount: eventosFiltrados.length,
+                  itemCount: eventos.length,
                   itemBuilder: (context, index) =>
-                      EventoCard(evento: eventosFiltrados[index]),
+                      EventoCard(evento: eventos[index]),
                 );
               },
             ),
           ),
         ],
       ),
-    );
-  }
-
-  // Widget auxiliar para los botoncitos de filtro
-  Widget _filtroChip(int index, String label) {
-    bool seleccionado = _filtroSeleccionado == index;
-    return ChoiceChip(
-      label: Text(label),
-      selected: seleccionado,
-      selectedColor: Colors.deepOrange.withOpacity(0.2),
-      onSelected: (bool selected) {
-        setState(() {
-          _filtroSeleccionado = index;
-        });
-      },
     );
   }
 }

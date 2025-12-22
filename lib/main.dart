@@ -1,31 +1,26 @@
+import 'package:finde_cat/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // Este archivo lo generó flutterfire configure
-import 'screens/home_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'firebase_options.dart';
+import 'screens/home_screen.dart';
 
 void main() async {
-  // 1. Asegurar que los widgets estén vinculados
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 2. Inicializar Firebase con las opciones automáticas
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await initializeDateFormatting('es', null);
-  runApp(const MyApp());
+  await initializeDateFormatting('es', null); // Para fechas en español
+  runApp(const FindeCatApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class FindeCatApp extends StatelessWidget {
+  const FindeCatApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Finde Cat',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme, // <--- CAMBIA ESTO
       home: const HomeScreen(),
     );
   }
