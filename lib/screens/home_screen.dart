@@ -1,99 +1,78 @@
 import 'package:flutter/material.dart';
-import '../../services/database_service.dart';
-import '../../models/evento_model.dart';
-import '../../widgets/evento_card.dart';
-// IMPORTANTE: Importa tus nuevos widgets fragmentados
+import 'package:provider/provider.dart'; // ¡No olvides este import!
+import '../providers/event_provider.dart';
 import 'home/widgets/home_search_bar.dart';
 import 'home/widgets/home_filters.dart';
+import '../../widgets/evento_card.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final DatabaseService _db = DatabaseService();
-  late Stream<List<Evento>> _eventosStream;
-
-  // Aquí es donde vive el controlador
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = "";
-  int _filtroTemporal = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _eventosStream = _db.getEventos();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose(); // Limpieza de memoria
-    super.dispose();
-  }
-
-  // ... lógica de _aplicarFiltros (igual que antes) ...
-  List<Evento> _aplicarFiltros(List<Evento> lista) {
-    List<Evento> resultados = lista;
-    if (_filtroTemporal != 0) {
-      final ahora = DateTime.now();
-      final dias = _filtroTemporal == 1 ? 15 : 30;
-      final fechaLimite = ahora.add(Duration(days: dias));
-      resultados = resultados
-          .where((e) => e.fechaInicio.isBefore(fechaLimite))
-          .toList();
-    }
-    if (_searchQuery.isNotEmpty) {
-      resultados = resultados
-          .where(
-            (e) => e.titulo.toLowerCase().contains(_searchQuery.toLowerCase()),
-          )
-          .toList();
-    }
-    return resultados;
-  }
-
-  @override
   Widget build(BuildContext context) {
+    // Usamos context.watch para que se redibuje cuando el Provider cambie
+    final eventProvider = context.watch<EventProvider>();
+    final eventos = eventProvider.eventosFiltrados;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Finde Cat 🐾')),
+      appBar: AppBar(title: const Text('Finde Cat'), elevation: 0),
       body: Column(
         children: [
-          // USAMOS EL WIDGET FRAGMENTADO
           HomeSearchBar(
-            controller: _searchController, // Pasamos el controlador
-            query: _searchQuery,
-            onChanged: (val) => setState(() => _searchQuery = val),
-            onClear: () {
-              _searchController.clear();
-              setState(() => _searchQuery = "");
+            controller: eventProvider
+                .searchController, // <--- Aquí pasamos el parámetro requerido
+            query: eventProvider.searchQuery,
+            onChanged: (val) {
+              // Ya no hace falta hacer nada aquí porque el Provider tiene un listener
             },
+            onClear: () => eventProvider.clearSearch(),
           ),
-          // USAMOS EL WIDGET FRAGMENTADO
           HomeFilters(
-            filtroTemporal: _filtroTemporal,
-            onFilterSelected: (index) =>
-                setState(() => _filtroTemporal = index),
+            filtroTemporal: eventProvider.filtroTemporal,
+            onFilterSelected: (index) => eventProvider.setFiltroTemporal(index),
           ),
           Expanded(
-            child: StreamBuilder<List<Evento>>(
-              stream: _eventosStream,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData)
-                  return const Center(child: CircularProgressIndicator());
-                final eventos = _aplicarFiltros(snapshot.data!);
-                return ListView.builder(
-                  itemCount: eventos.length,
-                  itemBuilder: (context, index) =>
-                      EventoCard(evento: eventos[index]),
-                );
-              },
-            ),
+            child: eventos.isEmpty
+                ? const Center(child: Text("No hay eventos en estas fechas"))
+                : ListView.builder(
+                    padding: const EdgeInsets.only(top: 10),
+                    itemCount: eventos.length,
+                    itemBuilder: (context, index) {
+                      // Mantenemos tu animación pero la simplificamos visualmente
+                      return AnimationItem(
+                        index: index,
+                        child: EventoCard(evento: eventos[index]),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
+    );
+  }
+}
+
+// Widget auxiliar para mantener el HomeScreen ultra limpio
+class AnimationItem extends StatelessWidget {
+  final int index;
+  final Widget child;
+  const AnimationItem({super.key, required this.index, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder(
+      duration: Duration(milliseconds: 400 + (index * 50)),
+      tween: Tween<double>(begin: 0, end: 1),
+      builder: (context, double value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 20 * (1 - value)),
+            child: child,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }

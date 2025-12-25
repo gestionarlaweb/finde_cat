@@ -18,11 +18,11 @@ class HomeFilters extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
-          _buildChip(0, "Todos"),
+          _buildChip(0, "Próximos 15 días"),
           const SizedBox(width: 8),
-          _buildChip(1, "Próximos 15 días"),
+          _buildChip(1, "Próximo mes"),
           const SizedBox(width: 8),
-          _buildChip(2, "Próximo mes"),
+          _buildChip(2, "Todos"),
         ],
       ),
     );
