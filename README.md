@@ -1,6 +1,6 @@
 # Finde Cat -📍
 
-**Finde Cat** es una Progressive Web App (PWA) de alto rendimiento desarrollada con **Flutter**. Su objetivo es conectar a los usuarios con los mejores eventos y actividades culturales en Cataluña mediante una interfaz intuitiva, rápida y funcional.
+**Finde Cat** es una Progressive Web App (PWA) de alto rendimiento desarrollada con **Flutter**. Su objetivo es conectar a los usuarios con los mejores eventos y actividades culturales en Catalunya mediante una interfaz intuitiva, rápida y funcional.
 
 ---
 
@@ -72,8 +72,6 @@ lib/
 
 Desarrollador: David Rabassa
 
-Web: https://gestionarlaweb.com
-
 LinkedIn: https://www.linkedin.com/in/david-rabassa-planas-687abb170/
 
-© 2025 Finde Cat - Eventos en Cataluña.
+© 2025 Finde Cat - Eventos en Catalunya.
