@@ -50,5 +50,5 @@ android/app/google-services.json
 # Firebase temp files
 .firebase/
 
-# Credenciales de Google (¡MUY IMPORTANTE!)
+# Credenciales de Google
 serviceAccountKey.json
