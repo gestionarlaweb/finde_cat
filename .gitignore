@@ -45,6 +45,10 @@ app.*.map.json
 /android/app/release
 # Secretos y claves personales
 lib/secrets.dart
-lib/firebase_options.dart
 android/app/google-services.json
+
+# Firebase temp files
+.firebase/
+
+# Credenciales de Google (¡MUY IMPORTANTE!)
 serviceAccountKey.json
