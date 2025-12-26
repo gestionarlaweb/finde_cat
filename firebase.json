@@ -1,1 +1,36 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"catalunya-events","appId":"1:773248846788:android:d9d15a3b703667ecc47291","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"catalunya-events","configurations":{"android":"1:773248846788:android:d9d15a3b703667ecc47291","web":"1:773248846788:web:ca625e605d70931ac47291"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "catalunya-events",
+          "appId": "1:773248846788:android:d9d15a3b703667ecc47291",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "catalunya-events",
+          "configurations": {
+            "android": "1:773248846788:android:d9d15a3b703667ecc47291",
+            "web": "1:773248846788:web:ca625e605d70931ac47291"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
